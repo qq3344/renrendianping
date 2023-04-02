@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.system.mapper.SysUserMapper">
+    <select id="pageQuery" resultType="com.sky.model.system.SysUser">
+        select
+            id,
+            username,
+            password,
+            name,
+            phone,
+            head_url,
+            post_id,
+            dept_id,
+            description,
+            status,
+            create_time,
+            update_time,
+            is_deleted
+        from sys_user
+        <where>
+            is_deleted = 0
+            <if test="vo.keyword != null and vo.keyword != ''">
+                and (username like concat("%",concat(#{vo.keyword},"%"))
+                or name like concat("%",concat(#{vo.keyword},"%"))
+                or phone like concat("%",concat(#{vo.keyword},"%")))
+            </if>
+            <if test="vo.createTimeBegin != null and vo.createTimeBegin != ''">
+                and create_time >= #{vo.createTimeBegin}
+            </if>
+            <if test="vo.createTimeEnd != null and vo.createTimeEnd != ''">
+                and create_time &lt;= #{vo.createTimeEnd}
+            </if>
+        </where>
+        order by id desc
+    </select>
+</mapper>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <title>人人点评</title>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="../css/element.css">
+  <link href="../css/main.css" rel="stylesheet">
+  <link href="../css/info.css" rel="stylesheet">
+  <link href="../css/vant.css" rel="stylesheet">
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="../css/mint-ui.css">
+
+  <style type="text/css">
+
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="header">
+      <div class="header-back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
+      <div class="header-title">资料编辑&nbsp;&nbsp;&nbsp;</div>
+    </div>
+    <div class="edit-container">
+      <div class="info-box">
+        <div class="info-item">
+          <div class="info-label">头像</div>
+          <van-uploader :after-read="uploadAvatar" />
+          <div class="info-btn">
+            <img width="35" :src="user.icon || '/imgs/icons/default-icon.png'" alt="">
+            <div><i class="el-icon-arrow-right"></i></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="info-item">
+          <div class="info-label">昵称</div>
+          <div class="info-btn" @click="goEditName">
+            <div>{{user.nickName}}</div>
+            <div>
+              <i class="el-icon-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="info-item">
+          <div class="info-label">个人介绍</div>
+          <div class="info-btn" @click="goEditIntroduce">
+            <div style="overflow: hidden; width: 150px;text-align: right">{{info.introduce || '介绍一下自己'}}</div>
+            <div>
+              <i class="el-icon-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-box">
+        <div class="info-item" @click="chooseSex">
+          <div class="info-label">性别</div>
+          <div class="info-btn">
+            <div>{{info.gender ? '女' : '男'}}</div>
+            <div><i class="el-icon-arrow-right"></i></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="info-item" @click="showAddrPopup=true">
+          <div class="info-label">城市</div>
+          <div class="info-btn">
+            <div>{{info.city || '选择'}}</div>
+            <div><i class="el-icon-arrow-right"></i></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="info-item" @click="showBirthdayPicker">
+          <div class="info-label">生日</div>
+          <div class="info-btn">
+            <div>{{info.birthday || '添加'}}</div>
+            <div><i class="el-icon-arrow-right"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-item">
+          <div class="info-label">我的积分</div>
+          <div class="info-btn">
+            <div>查看积分</div>
+            <div><i class="el-icon-arrow-right"></i></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="info-item">
+          <div class="info-label">会员等级</div>
+          <div class="info-btn">
+            <div><a href="javascript:void(0)">成为VIP尊享特权</a></div>
+            <div><i class="el-icon-arrow-right"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 选择器 -->
+    <mt-datetime-picker ref="picker" type="date" v-model="pickerValue" year-format="{value} 年" month-format="{value} 月"
+      date-format="{value} 日" :start-date="new Date('1970-01-01')" :end-date="new Date()" @confirm="handleConfirm">
+    </mt-datetime-picker>
+
+    <van-popup v-model="showAddrPopup" position="bottom">
+      <van-area ref="myArea" title="选择地区" :area-list="areaList" @confirm="confArea" @change="onChange"
+        @cancel="onCancel" />
+    </van-popup>
+
+    <mt-actionsheet :actions="actions" v-model="sheetVisible">
+    </mt-actionsheet>
+    <foot-bar :active-btn="4"></foot-bar>
+  </div>
+
+  <script src="../js/vue.js"></script>
+  <script src="../js/axios.min.js"></script>
+  <!-- 引入组件库 -->
+  <script src="../js/vant.min.js"></script>
+  <script src="../js/mint-ui.js"></script>
+  <script src="../js/element.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/footer.js"></script>
+  <script type="module">
+    import AreaList from '../js/area.js';
+
+    const app = new Vue({
+      el: "#app",
+      data() {
+        return {
+          user: "",
+          info: {},
+          gender: '',
+          areaList: AreaList,
+          //弹出层展示
+          showAddrPopup: false,
+          //数据滚动选择临时数据
+          chooseTempValue: "",
+          //页面选择后的数据 和v-model一致
+          chooseValue: "",
+          actions: [
+            {
+              name: '男',
+              method: () => {
+                this.info.gender = false
+                axios.post("/userInfo/updateGender", this.info)
+                  .then(res => {
+                    // location.href = "info-edit.html"
+                    this.checkLogin();
+                  })
+                  .catch(err => this.$message.error(err))
+              }
+            },
+            {
+              name: '女',
+              method: () => {
+                this.info.gender = true
+                axios.post("/userInfo/updateGender", this.info)
+                  .then(res => {
+                    // location.href = "info-edit.html"
+                    this.checkLogin();
+                  })
+                  .catch(err => this.$message.error(err))
+              }
+            }
+          ],
+          sheetVisible: false,
+          pickerValue: '',
+        }
+      },
+      created() {
+        this.checkLogin();
+        this.initParams();
+      },
+      methods: {
+        checkLogin() {
+          // 查询用户信息
+          axios.get("/user/me")
+            .then(({ data }) => {
+              this.user = data;
+              this.info = JSON.parse(sessionStorage.getItem("userInfo")) || {}
+              axios.get("/user/info/" + this.user.id)
+                .then(({ data }) => {
+                  if (!data) {
+                    return
+                  }
+                  // 保存用户详情
+                  this.info = data;
+                  // 保存到本地
+                  sessionStorage.setItem("userInfo", JSON.stringify(data))
+                })
+                .catch(err => {
+                  this.$message.error(err);
+                })
+            })
+            .catch(err => {
+              this.$message.error(err);
+              setTimeout(() => location.href = "login.html", 1000)
+            })
+        },
+        goBack() {
+          history.back();
+        },
+        chooseSex() {
+          this.sheetVisible = !this.sheetVisible;
+        },
+        goEditName() {
+          location.href = "edit-name.html"
+        },
+        goEditIntroduce() {
+          location.href = "edit-introduce.html"
+        },
+        showBirthdayPicker() {
+          this.$refs.picker.open();
+        },
+        uploadAvatar(file) {
+          console.log(file);
+          console.log(file.file);
+          let formData = new FormData();
+          const config = {
+            headers: { "Content-Type": "multipart/form-data;boundary=" + new Date().getTime() }
+          };
+          formData.append("file", file.file);
+          axios
+            .post("/userInfo/uploadAvatar", formData, config)
+            .then(({ data }) => this.checkLogin())
+            .catch(this.$message.error);
+        },
+        handleConfirm() {
+          this.$refs.picker.close();
+          var month = this.pickerValue.getMonth() + 1;
+          if (month < 10) {
+            month = "0" + month
+          }
+          var day = this.pickerValue.getDate();
+          if (day < 10) {
+            day = "0" + day
+          }
+          this.info.birthday = this.pickerValue.getFullYear() + '-' + month + '-' + day;
+          console.log(this.info.birthday);
+          axios.post("/userInfo/updateBirthday", this.info)
+            .then(res => {
+              // location.href = "info-edit.html"
+              this.checkLogin();
+            })
+            .catch(err => this.$message.error(err))
+        },
+        /**
+         * 初始地区化数据
+         */
+        initParams() {
+          this.areaList = AreaList;
+        },
+
+        /**
+         * 数据滚动选择监听数据变化
+         * @param picker
+         * @param index
+         * @param value
+         * value=0改变省，1改变市，2改变区
+         */
+        onChange(picker, index, value) {
+          let val = picker.getValues();
+          let areaName = ''
+          for (var i = 0; i < val.length; i++) {
+            areaName = areaName + (i == 0 ? '' : '/') + val[i].name
+          }
+          //保存滚动选择的值
+          this.chooseTempValue = areaName
+          // console.log("chooseTempValue" + this.chooseTempValue);
+        },
+
+        //点击imput触发，弹框事件
+        areaChoose() {
+          this.showAddrPopup = true;
+        },
+
+        //点击取消后的事件
+        onCancel() {
+          this.showAddrPopup = false//关闭弹框
+          //由于对滚动的数据保存到临时的变量chooseTempValue中，与选择后现实的数据做了解耦合，因此，这里不炫耀重置城市列表
+          // this.$refs.myArea.reset()// 重置城市列表
+        },
+
+        //当提交表单数据时需要，将地区数据提交到后端，因此，当选择完成后
+        //确定选择后保存事件
+        confArea(data) {
+          this.chooseValue = this.chooseTempValue
+          console.log(this.chooseValue);
+          this.info.city = this.chooseValue;
+          axios.post("/userInfo/updateCity", this.info)
+            .then(res => {
+              // location.href = "info-edit.html"
+              this.checkLogin();
+            })
+            .catch(err => { this.$message.error(err) })
+          // console.log(data[0].name + "," + data[1].name + "," + data[2].name)
+          this.showAddrPopup = false//关闭弹框
+
+        }
+      },
+
+
+    })
+  </script>
+</body>
+
+</html>

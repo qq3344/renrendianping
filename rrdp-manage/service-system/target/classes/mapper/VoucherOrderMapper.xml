@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.system.mapper.VoucherOrderMapper">
+
+    <select id="queryVoucherOrderList" resultType="com.sky.model.vo.VoucherOrderVo">
+		SELECT
+			tb_voucher_order.id,
+			tb_voucher.title,
+			tb_voucher.type as voucherTypeId,
+			tb_voucher_order.pay_type,
+			tb_voucher_order.`status`,
+			tb_voucher_order.create_time,
+			tb_user.nick_name,
+			tb_shop.name as shopName,
+			tb_shop_type.name as shopType
+		FROM
+			tb_voucher_order
+			INNER JOIN
+			tb_user
+			ON
+				tb_voucher_order.user_id = tb_user.id
+			INNER JOIN
+			tb_voucher
+			ON
+				tb_voucher_order.voucher_id = tb_voucher.id
+			INNER JOIN
+			tb_shop
+			ON
+				tb_voucher.shop_id = tb_shop.id
+			INNER JOIN
+			tb_shop_type
+			ON
+				tb_shop.type_id = tb_shop_type.id
+		<where>
+			tb_voucher_order.is_deleted = 0
+			<if test="vo.shopName != null and vo.shopName != ''">
+				and tb_shop.name like concat("%",concat(#{vo.shopName},"%"))
+			</if>
+			<if test="vo.nickName != null and vo.nickName != ''">
+				and tb_user.nick_name like concat("%",concat(#{vo.nickName},"%"))
+			</if>
+			<if test="vo.voucherType == 0 or vo.voucherType != null ">
+				and tb_shop_type.id = #{vo.voucherType}
+			</if>
+			order by tb_voucher_order.create_time desc
+		</where>
+    </select>
+</mapper>

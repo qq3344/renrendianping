@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.system.mapper.BlogCommentsMapper">
+    <select id="queryBlogCommentsList" resultType="com.sky.model.vo.BlogCommentsVo">
+        SELECT
+            tb_blog_comments.id,
+            tb_blog_comments.user_id,
+            tb_blog_comments.answer_id,
+            tb_blog_comments.content,
+            tb_blog_comments.create_time,
+            tb_user.nick_name,
+            tb_user.icon
+        FROM
+            tb_user
+            INNER JOIN
+            tb_blog_comments
+            ON
+                tb_user.id = tb_blog_comments.user_id
+            <where>
+                <if test="vo.content != null and vo.content != ''">
+                    and tb_blog_comments.content like concat("%",concat(#{vo.content},"%"))
+                </if>
+                <if test="vo.username != null and vo.username != ''">
+                    and tb_user.nick_name like concat("%",concat(#{vo.username},"%"))
+                </if>
+            </where>
+        ORDER BY tb_blog_comments.create_time desc
+    </select>
+</mapper>

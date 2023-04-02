@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.system.mapper.BlogMapper">
+    <select id="queryBlogList" resultType="com.sky.model.vo.BlogVo">
+        SELECT
+            tb_blog.user_id,
+            tb_blog.shop_id,
+            tb_shop.name as shop_name,
+            tb_blog.id,
+            tb_blog.title,
+            tb_blog.images,
+            tb_blog.content,
+            tb_blog.liked,
+            tb_blog.comments,
+            tb_blog.create_time,
+            tb_blog.update_time,
+            tb_user.nick_name as username
+        FROM
+            tb_user
+            INNER JOIN
+            tb_blog
+            ON
+                tb_user.id = tb_blog.user_id
+            INNER JOIN
+            tb_shop
+            ON
+                tb_shop.id = tb_blog.shop_id
+        <where>
+            tb_blog.is_deleted = 0
+            <if test="vo.keyword != null and vo.keyword != ''">
+                and tb_shop.name like concat("%",concat(#{vo.keyword},"%"))
+            </if>
+        </where>
+
+    </select>
+    <select id="queryBlogVoById" resultType="com.sky.model.vo.BlogVo">
+        SELECT
+        tb_blog.user_id,
+        tb_blog.shop_id,
+        tb_shop.name as shop_name,
+        tb_blog.id,
+        tb_blog.title,
+        tb_blog.images,
+        tb_blog.content,
+        tb_blog.liked,
+        tb_blog.comments,
+        tb_blog.create_time,
+        tb_blog.update_time,
+        tb_user.nick_name as username
+        FROM
+        tb_user
+        INNER JOIN
+        tb_blog
+        ON
+        tb_user.id = tb_blog.user_id
+        INNER JOIN
+        tb_shop
+        ON
+        tb_shop.id = tb_blog.shop_id
+        <where>
+            tb_blog.is_deleted = 0
+            and tb_blog.id = #{id}
+        </where>
+    </select>
+</mapper>

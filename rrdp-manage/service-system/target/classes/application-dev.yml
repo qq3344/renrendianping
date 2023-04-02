@@ -1,0 +1,29 @@
+server:
+  port: 8800
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 默认日志
+  mapper-locations: classpath:mapper/*.xml
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/rrdp?serverTimezone=GMT%2B8
+    username: root
+    password: root
+
+  redis:
+#    host: 47.112.138.176
+    host: 47.113.220.16
+    port: 6379
+    password: qq123321
+

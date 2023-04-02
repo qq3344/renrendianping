@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=bmvg8yeOopwOB4aHl5uvx52rgIa3VrPO"></script>
+  <link href="../css/main.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/element.css">
+
+  <style>
+
+    html, body {
+        height: 80%;
+        width: 100%;
+
+    }
+    #app {
+        height: 100%;
+        width: 100%;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div id="container" style="width: 100%;height:80%"></div>
+  <foot-bar :active-btn="2"></foot-bar>
+</div>
+<script src="../js/vue.js"></script>
+<script src="../js/axios.min.js"></script>
+<script src="../js/element.js"></script>
+<script src="../js/common.js"></script>
+<!-- 引入组件库 -->
+<script>
+    // 百度地图API功能
+    const map = new BMap.Map('container'); // 创建Map实例
+    map.centerAndZoom(new BMap.Point(116.404, 39.915), 12); // 初始化地图,设置中心点坐标和地图级别
+    map.enableScrollWheelZoom(true); // 开启鼠标滚轮缩放
+
+    var geolocation = new BMap.Geolocation();
+    geolocation.getCurrentPosition(function (r) {
+        if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+            var mk = new BMap.Marker(r.point);
+            map.addOverlay(mk);
+            map.panTo(r.point);
+        } else {
+        }
+    });
+</script>
+</body>
+</html>

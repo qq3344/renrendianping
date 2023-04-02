@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.system.mapper.ShopMapper">
+    <select id="pageQuery" resultType="com.sky.model.vo.ShopVo">
+        select
+            st.name type_name,
+            st.id type_id,
+            s.id,
+            s.name,
+            s.images,
+            s.area,
+            s.address,
+            s.avg_price,
+            s.sold,
+            s.comments,
+            s.score,
+            s.open_hours,
+            s.create_time,
+            s.update_time
+        from tb_shop_type st,tb_shop s
+        <where>
+            st.id = s.type_id
+            and s.is_deleted = 0
+            <if test="vo.keyword != '' and vo.keyword != null">
+                and s.name like concat("%",concat(#{vo.keyword},"%"))
+            </if>
+        </where>
+
+    </select>
+</mapper>
